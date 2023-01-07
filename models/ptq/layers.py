@@ -184,7 +184,7 @@ class QIntLayerNorm(nn.LayerNorm):
             x_q = (x / in_scale).round()
             
             cur_file_num=len(os.listdir('/kaggle/working/layer_norm_input/x_q_inputs'))   # save x_q inputs
-            torch.save(x, "/kaggle/working/layer_norm_input/x_q_inputs/x_q_"+str(cur_file_num)+".pt") 
+            torch.save(x_q, "/kaggle/working/layer_norm_input/x_q_inputs/x_q_"+str(cur_file_num)+".pt") 
             
             in_scale1 = in_scale.min()
             in_scale_mask = (in_scale / in_scale1).round()
