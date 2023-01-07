@@ -1,6 +1,7 @@
 # Copyright (c) MEGVII Inc. and its affiliates. All Rights Reserved.
 import torch
 import torch.nn as nn
+import os
 from torch.nn import functional as F
 
 from .bit_type import BIT_TYPE_DICT
@@ -181,8 +182,20 @@ class QIntLayerNorm(nn.LayerNorm):
             in_scale = in_scale.reshape(1, 1, -1)
             out_scale = out_scale.reshape(1, 1, -1)
             x_q = (x / in_scale).round()
+            
+            cur_file_num=len(os.listdir('/kaggle/working/layer_norm_input/x_q_inputs'))   # save x_q inputs
+            torch.save(x, "/kaggle/working/layer_norm_input/x_q_inputs/x_q_"+str(cur_file_num)+".pt") 
+            
             in_scale1 = in_scale.min()
             in_scale_mask = (in_scale / in_scale1).round()
+            # save out scale
+            torch.save(out_scale, "/kaggle/working/layer_norm_input/out_scales/out_scale_"+str(cur_file_num)+".pt") 
+
+            # save scale1
+            torch.save(in_scale1, "/kaggle/working/layer_norm_input/in_scale1s/scale1_"+str(cur_file_num)+".pt") 
+
+            # save scale mask
+            torch.save(in_scale_mask, "/kaggle/working/layer_norm_input/scale_masks/scale_mask_"+str(cur_file_num)+".pt") 
 
             x_q = x_q * in_scale_mask
 
@@ -201,6 +214,8 @@ class QIntLayerNorm(nn.LayerNorm):
 
             x_q = ((A_sign * M * x_q + B) / torch.pow(2, N)).round()
             x = x_q * out_scale
+            # save output
+            torch.save(x, "/kaggle/working/layer_norm_input/outputs/output_"+str(cur_file_num)+".pt") 
         else:
             raise NotImplementedError
         return x
