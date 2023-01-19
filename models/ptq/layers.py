@@ -220,10 +220,10 @@ class QIntLayerNorm(nn.LayerNorm):
   #          if cur_file_num<=100:
    #           torch.save(x, "/kaggle/working/layer_norm_input/outputs/output_"+str(cur_file_num)+".pt") 
             #save weight and bias 
-            cur_file_num=len(os.listdir('/kaggle/working/layer_norm_weight'))   # save x_q inputs
-            if cur_file_num<=3:
-              torch.save(self.weight, "/kaggle/working/layer_norm_weight/ln_w_"+str(cur_file_num)+".pt") 
-              torch.save(self.bias, "/kaggle/working/layer_norm_bias/ln_b_"+str(cur_file_num)+".pt") 
+            # cur_file_num=len(os.listdir('/kaggle/working/layer_norm_weight'))   # save x_q inputs
+            # if cur_file_num<=3:
+            #   torch.save(self.weight, "/kaggle/working/layer_norm_weight/ln_w_"+str(cur_file_num)+".pt") 
+            #   torch.save(self.bias, "/kaggle/working/layer_norm_bias/ln_b_"+str(cur_file_num)+".pt") 
         else:
             raise NotImplementedError
         return x
