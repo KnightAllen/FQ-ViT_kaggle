@@ -182,22 +182,20 @@ class QIntLayerNorm(nn.LayerNorm):
             in_scale = in_scale.reshape(1, 1, -1)
             out_scale = out_scale.reshape(1, 1, -1)
             x_q = (x / in_scale).round()
-            
-  #          cur_file_num=len(os.listdir('/kaggle/working/layer_norm_input/x_q_inputs'))   # save x_q inputs
-   #         if cur_file_num<=100:
-    #          torch.save(x_q, "/kaggle/working/layer_norm_input/x_q_inputs/x_q_"+str(cur_file_num)+".pt") 
+
+            # save x_q inputs
+            cur_file_num=len(os.listdir('/kaggle/working/layer_norm_input/x_q_inputs'))   
+            if cur_file_num<=3:
+                torch.save(x_q, "/kaggle/working/x_q_inputs/x_q_"+str(cur_file_num)+".pt") 
             
             in_scale1 = in_scale.min()
             in_scale_mask = (in_scale / in_scale1).round()
-  #          if cur_file_num<=100:
-              # save out scale
- #             torch.save(out_scale, "/kaggle/working/layer_norm_input/out_scales/out_scale_"+str(cur_file_num)+".pt") 
-
-              # save scale1
-  #            torch.save(in_scale1, "/kaggle/working/layer_norm_input/in_scale1s/scale1_"+str(cur_file_num)+".pt") 
-
-              # save scale mask
-  #            torch.save(in_scale_mask, "/kaggle/working/layer_norm_input/scale_masks/scale_mask_"+str(cur_file_num)+".pt") 
+            
+            #save out scale ,scale1 , scale mask
+            if cur_file_num<=3:
+                torch.save(out_scale, "/kaggle/working/out_scales/out_scale_"+str(cur_file_num)+".pt") 
+                torch.save(in_scale1, "/kaggle/working/in_scale1s/scale1_"+str(cur_file_num)+".pt") 
+                torch.save(in_scale_mask, "/kaggle/working/scale_masks/scale_mask_"+str(cur_file_num)+".pt") 
 
             x_q = x_q * in_scale_mask
 
@@ -217,13 +215,12 @@ class QIntLayerNorm(nn.LayerNorm):
             x_q = ((A_sign * M * x_q + B) / torch.pow(2, N)).round()
             x = x_q * out_scale
             # save output
-  #          if cur_file_num<=100:
-   #           torch.save(x, "/kaggle/working/layer_norm_input/outputs/output_"+str(cur_file_num)+".pt") 
+            if cur_file_num<=3:
+                torch.save(x, "/kaggle/working/outputs/output_"+str(cur_file_num)+".pt") 
             #save weight and bias 
-            # cur_file_num=len(os.listdir('/kaggle/working/layer_norm_weight'))   # save x_q inputs
-            # if cur_file_num<=3:
-            #   torch.save(self.weight, "/kaggle/working/layer_norm_weight/ln_w_"+str(cur_file_num)+".pt") 
-            #   torch.save(self.bias, "/kaggle/working/layer_norm_bias/ln_b_"+str(cur_file_num)+".pt") 
+            if cur_file_num<=3:
+                torch.save(self.weight, "/kaggle/working/layer_norm_weight/ln_w_"+str(cur_file_num)+".pt") 
+                torch.save(self.bias, "/kaggle/working/layer_norm_bias/ln_b_"+str(cur_file_num)+".pt") 
         else:
             raise NotImplementedError
         return x
