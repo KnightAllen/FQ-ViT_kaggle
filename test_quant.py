@@ -111,8 +111,8 @@ def main():
     val_transform = build_transform(mean=mean, std=std, crop_pct=crop_pct)
 
     # Data
-    traindir = os.path.join('/kaggle/input/imagenet-object-localization-challenge/ILSVRC/Data/CLS-LOC', 'train')   # data in kaggle 
-    valdir = os.path.join('/kaggle/working', 'val')
+    traindir = os.path.join('/kaggle/input/imagenetmini-1000/imagenet-mini', 'train')   # data in kaggle 
+    valdir = os.path.join('/kaggle/input/imagenetmini-1000/imagenet-mini', 'val')
 
     val_dataset = datasets.ImageFolder(valdir, val_transform)
     val_loader = torch.utils.data.DataLoader(
