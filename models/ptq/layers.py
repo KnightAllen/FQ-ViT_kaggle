@@ -272,6 +272,7 @@ class QIntSoftmax(nn.Module):
             b_int = torch.floor(coef[1] / scaling_factor)
             c_int = torch.floor(coef[2] / scaling_factor**2)
             #save b_int,c_int
+            cur_file_num=len(os.listdir('/kaggle/working/b_ints'))              
             if cur_file_num<=3:
                 torch.save(b_int, "/kaggle/working/b_ints/b_int"+str(cur_file_num)+".pt")
                 torch.save(c_int, "/kaggle/working/c_ints/c_int"+str(cur_file_num)+".pt")
@@ -288,6 +289,7 @@ class QIntSoftmax(nn.Module):
             n = 30  # sufficiently large integer
             x0_int = torch.floor(x0 / scaling_factor)
             # save x0_int
+            cur_file_num=len(os.listdir('/kaggle/working/x0_ints'))  
             if cur_file_num<=3:
                 torch.save(x0_int, "/kaggle/working/x0_ints/x0_int"+str(cur_file_num)+".pt")
 
@@ -323,7 +325,8 @@ class QIntSoftmax(nn.Module):
             softmax_out = torch.round(exp_int_sum / exp_int)
             rounds = self.log_round(softmax_out)
             mask = rounds >= 2**self.bit_type.bits
-            #save out mask
+            #save  out masks
+            cur_file_num=len(os.listdir('/kaggle/working/out_masks'))   
             if cur_file_num<=3:
                 torch.save(mask, "/kaggle/working/out_masks/out_mask_"+str(cur_file_num)+".pt")   
            
