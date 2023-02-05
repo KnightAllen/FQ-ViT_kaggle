@@ -104,7 +104,7 @@ class Attention(nn.Module):
             qkv[2],
         )  # make torchscript happy (cannot use tensor as tuple)
         attn = (q @ k.transpose(-2, -1)) * self.scale
-        cur_file_num=len(os.listdir('/kaggle/working/qact_attn1_test/qact_attn1_in'))   
+        cur_file_num=len(os.listdir('/kaggle/working/qact_attn1_test'))   
         if cur_file_num<=2:
             torch.save(attn, "/kaggle/working/qact_attn1_test/qact_attn1_in_"+str(cur_file_num)+".pt")     
         attn = self.qact_attn1(attn)
