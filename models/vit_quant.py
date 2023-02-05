@@ -104,7 +104,15 @@ class Attention(nn.Module):
             qkv[2],
         )  # make torchscript happy (cannot use tensor as tuple)
         attn = (q @ k.transpose(-2, -1)) * self.scale
+        cur_file_num=len(os.listdir('/kaggle/working/qact_attn1_test/qact_attn1_in'))   
+        if cur_file_num<=2:
+            torch.save(attn, "/kaggle/working/qact_attn1_test/qact_attn1_in_"+str(cur_file_num)+".pt")     
         attn = self.qact_attn1(attn)
+        if cur_file_num<=2:
+            torch.save(attn, "/kaggle/working/qact_attn1_test/qact_attn1_out_"+str(cur_file_num)+".pt") 
+            torch.save(self.qact_attn1.quantizer.scale, "/kaggle/working/qact_attn1_test/qact_attn1_scale_"+str(cur_file_num)+".pt") 
+            torch.save(self.qact_attn1.quantizer.zero_point, "/kaggle/working/qact_attn1_test/qact_attn1_zp_"+str(cur_file_num)+".pt") 
+
         attn = self.log_int_softmax(attn, self.qact_attn1.quantizer.scale)
         attn = self.attn_drop(attn)
         x = (attn @ v).transpose(1, 2).reshape(B, N, C)
