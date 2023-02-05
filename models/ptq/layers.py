@@ -273,7 +273,7 @@ class QIntSoftmax(nn.Module):
             c_int = torch.floor(coef[2] / scaling_factor**2)
             #save b_int,c_int
             cur_file_num=len(os.listdir('/kaggle/working/b_ints'))              
-            if cur_file_num<=3:
+            if cur_file_num<=3 and self.calibrate:
                 torch.save(b_int, "/kaggle/working/b_ints/b_int"+str(cur_file_num)+".pt")
                 torch.save(c_int, "/kaggle/working/c_ints/c_int"+str(cur_file_num)+".pt")
 
@@ -290,7 +290,7 @@ class QIntSoftmax(nn.Module):
             x0_int = torch.floor(x0 / scaling_factor)
             # save x0_int
             cur_file_num=len(os.listdir('/kaggle/working/x0_ints'))  
-            if cur_file_num<=3:
+            if cur_file_num<=3 and self.calibrate:
                 torch.save(x0_int, "/kaggle/working/x0_ints/x0_int"+str(cur_file_num)+".pt")
 
             x_int = torch.max(x_int, n * x0_int)
@@ -305,13 +305,13 @@ class QIntSoftmax(nn.Module):
         
         #save q_softmax_in
         cur_file_num=len(os.listdir('/kaggle/working/q_softmax_inputs'))   
-        if cur_file_num<=3:
+        if cur_file_num<=3 and self.calibrate:
             torch.save(x_int, "/kaggle/working/q_softmax_inputs/q_softmax_in_"+str(cur_file_num)+".pt")     
         
         x_int_max, _ = x_int.max(dim=-1, keepdim=True)
         
         #save q_softmax_max
-        if cur_file_num<=3:
+        if cur_file_num<=3 and self.calibrate:
             torch.save(x_int_max, "/kaggle/working/q_softmax_maxs/q_softmax_max_"+str(cur_file_num)+".pt")   
         
         x_int = x_int - x_int_max
@@ -327,12 +327,13 @@ class QIntSoftmax(nn.Module):
             mask = rounds >= 2**self.bit_type.bits
             #save  out masks
             cur_file_num=len(os.listdir('/kaggle/working/out_masks'))   
-            if cur_file_num<=3:
+            if cur_file_num<=3 and self.calibrate:
                 torch.save(mask, "/kaggle/working/out_masks/out_mask_"+str(cur_file_num)+".pt")   
            
-            qlog = torch.clamp(rounds, 0, 2**self.bit_type.bits - 1)
+            qlog = torch.clamp
+            (rounds, 0, 2**self.bit_type.bits - 1)
             #save out qlog
-            if cur_file_num<=3:
+            if cur_file_num<=3 and self.calibrate:
                 torch.save(qlog, "/kaggle/working/out_qlogs/out_qlog_"+str(cur_file_num)+".pt")
 
             deq_softmax = 2**(-qlog)
