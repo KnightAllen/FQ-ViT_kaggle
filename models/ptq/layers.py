@@ -183,19 +183,19 @@ class QIntLayerNorm(nn.LayerNorm):
             out_scale = out_scale.reshape(1, 1, -1)
             x_q = (x / in_scale).round()
 
-            # save x_q inputs
-            cur_file_num=len(os.listdir('/kaggle/working/x_q_inputs'))   
-            if cur_file_num<=3:
-                torch.save(x_q, "/kaggle/working/x_q_inputs/x_q_"+str(cur_file_num)+".pt") 
+            ## save x_q inputs
+            #cur_file_num=len(os.listdir('/kaggle/working/x_q_inputs'))   
+            #if cur_file_num<=3:
+            #    torch.save(x_q, "/kaggle/working/x_q_inputs/x_q_"+str(cur_file_num)+".pt") 
             
             in_scale1 = in_scale.min()
             in_scale_mask = (in_scale / in_scale1).round()
             
-            #save out scale ,scale1 , scale mask
-            if cur_file_num<=3:
-                torch.save(out_scale, "/kaggle/working/out_scales/out_scale_"+str(cur_file_num)+".pt") 
-                torch.save(in_scale1, "/kaggle/working/in_scale1s/scale1_"+str(cur_file_num)+".pt") 
-                torch.save(in_scale_mask, "/kaggle/working/scale_masks/scale_mask_"+str(cur_file_num)+".pt") 
+            ##save out scale ,scale1 , scale mask
+            #if cur_file_num<=3:
+            #    torch.save(out_scale, "/kaggle/working/out_scales/out_scale_"+str(cur_file_num)+".pt") 
+            #    torch.save(in_scale1, "/kaggle/working/in_scale1s/scale1_"+str(cur_file_num)+".pt") 
+            #    torch.save(in_scale_mask, "/kaggle/working/scale_masks/scale_mask_"+str(cur_file_num)+".pt") 
 
             x_q = x_q * in_scale_mask
 
@@ -214,13 +214,13 @@ class QIntLayerNorm(nn.LayerNorm):
 
             x_q = ((A_sign * M * x_q + B) / torch.pow(2, N)).round()
             x = x_q * out_scale
-            # save output
-            if cur_file_num<=3:
-                torch.save(x, "/kaggle/working/outputs/output_"+str(cur_file_num)+".pt") 
-            #save weight and bias 
-            if cur_file_num<=3:
-                torch.save(self.weight, "/kaggle/working/layer_norm_weight/ln_w_"+str(cur_file_num)+".pt") 
-                torch.save(self.bias, "/kaggle/working/layer_norm_bias/ln_b_"+str(cur_file_num)+".pt") 
+            ## save output
+            #if cur_file_num<=3:
+            #    torch.save(x, "/kaggle/working/outputs/output_"+str(cur_file_num)+".pt") 
+            ## save weight and bias 
+            #if cur_file_num<=3:
+            #    torch.save(self.weight, "/kaggle/working/layer_norm_weight/ln_w_"+str(cur_file_num)+".pt") 
+            #    torch.save(self.bias, "/kaggle/working/layer_norm_bias/ln_b_"+str(cur_file_num)+".pt") 
         else:
             raise NotImplementedError
         return x
@@ -271,6 +271,12 @@ class QIntSoftmax(nn.Module):
             coef[2] /= coef[0]
             b_int = torch.floor(coef[1] / scaling_factor)
             c_int = torch.floor(coef[2] / scaling_factor**2)
+            #save b_int,c_int
+            if cur_file_num<=3:
+                torch.save(b_int, "/kaggle/working/b_ints/b_int"+str(cur_file_num)+".pt")
+                torch.save(c_int, "/kaggle/working/c_ints/c_int"+str(cur_file_num)+".pt")
+
+
             z = x_int + b_int
             z = x_int * z
             z = z + c_int
@@ -281,6 +287,10 @@ class QIntSoftmax(nn.Module):
             x0 = -0.6931  # -ln2
             n = 30  # sufficiently large integer
             x0_int = torch.floor(x0 / scaling_factor)
+            # save x0_int
+            if cur_file_num<=3:
+                torch.save(x0_int, "/kaggle/working/x0_ints/x0_int"+str(cur_file_num)+".pt")
+
             x_int = torch.max(x_int, n * x0_int)
             q = torch.floor(x_int / x0_int)
             r = x_int - x0_int * q
@@ -290,7 +300,18 @@ class QIntSoftmax(nn.Module):
             return exp_int, scaling_factor
 
         x_int = x / scaling_factor
+        
+        #save q_softmax_in
+        cur_file_num=len(os.listdir('/kaggle/working/q_softmax_inputs'))   
+        if cur_file_num<=3:
+            torch.save(x_int, "/kaggle/working/q_softmax_inputs/q_softmax_in_"+str(cur_file_num)+".pt")     
+        
         x_int_max, _ = x_int.max(dim=-1, keepdim=True)
+        
+        #save q_softmax_max
+        if cur_file_num<=3:
+            torch.save(x_int_max, "/kaggle/working/q_softmax_maxs/q_softmax_max_"+str(cur_file_num)+".pt")   
+        
         x_int = x_int - x_int_max
         exp_int, exp_scaling_factor = int_exp(x_int, scaling_factor)
         exp_int_sum = exp_int.sum(dim=-1, keepdim=True)
@@ -302,7 +323,15 @@ class QIntSoftmax(nn.Module):
             softmax_out = torch.round(exp_int_sum / exp_int)
             rounds = self.log_round(softmax_out)
             mask = rounds >= 2**self.bit_type.bits
+            #save out mask
+            if cur_file_num<=3:
+                torch.save(mask, "/kaggle/working/out_masks/out_mask_"+str(cur_file_num)+".pt")   
+           
             qlog = torch.clamp(rounds, 0, 2**self.bit_type.bits - 1)
+            #save out qlog
+            if cur_file_num<=3:
+                torch.save(qlog, "/kaggle/working/out_qlogs/out_qlog_"+str(cur_file_num)+".pt")
+
             deq_softmax = 2**(-qlog)
             deq_softmax[mask] = 0
             return deq_softmax
