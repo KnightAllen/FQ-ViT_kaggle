@@ -105,10 +105,10 @@ class Attention(nn.Module):
         )  # make torchscript happy (cannot use tensor as tuple)
         attn = (q @ k.transpose(-2, -1)) * self.scale
         cur_file_num=len(os.listdir('/kaggle/working/qact_attn1_test'))   
-        if cur_file_num<=10*4 and self.qact_attn1.quantizer.scale is not None:
+        if cur_file_num<1 and self.qact_attn1.calibrate is False:
             torch.save(attn, "/kaggle/working/qact_attn1_test/qact_attn1_in_"+str(cur_file_num)+".pt")     
         attn = self.qact_attn1(attn)
-        if cur_file_num<=10*4 and self.qact_attn1.quantizer.scale is not None:
+        if cur_file_num<1 and self.qact_attn1.calibrate is False:
             torch.save(attn, "/kaggle/working/qact_attn1_test/qact_attn1_out_"+str(cur_file_num)+".pt") 
             torch.save(self.qact_attn1.quantizer.scale, "/kaggle/working/qact_attn1_test/qact_attn1_scale_"+str(cur_file_num)+".pt") 
             torch.save(self.qact_attn1.quantizer.zero_point, "/kaggle/working/qact_attn1_test/qact_attn1_zp_"+str(cur_file_num)+".pt") 
